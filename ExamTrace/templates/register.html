@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Register | ExamGuard</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/common.css') }}">
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/register.css') }}">
+
+</head>
+
+<body>
+
+<div class="register-page">
+
+<div class="register-box">
+
+<h1>Create Account</h1>
+
+<p>Candidate Registration</p>
+
+{% with messages = get_flashed_messages(with_categories=true) %}
+{% if messages %}
+{% for category,message in messages %}
+
+<div class="flash {{category}}">
+{{message}}
+</div>
+
+{% endfor %}
+{% endif %}
+{% endwith %}
+
+<form
+method="POST"
+enctype="multipart/form-data">
+
+<div class="form-group">
+
+<label>Username</label>
+
+<input
+type="text"
+name="username"
+placeholder="Enter Username"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label>Email</label>
+
+<input
+type="email"
+name="email"
+placeholder="Enter Email"
+required>
+
+</div>
+
+<div class="form-group">
+
+<label>Password</label>
+
+<input
+type="password"
+name="password"
+placeholder="Enter Password"
+required>
+
+</div>
+
+<div class="camera-section">
+
+    <video id="video" autoplay playsinline></video>
+
+    <canvas id="canvas" width="300" height="230" style="display:none;"></canvas>
+
+    <input type="hidden" name="photo" id="photo">
+
+    <br>
+
+    <button type="button" class="capture-btn" onclick="capturePhoto()">
+        📷 Capture Photo
+    </button>
+
+</div>
+
+<button
+class="btn register-btn">
+
+Register
+
+</button>
+
+</form>
+
+<div class="bottom-text">
+
+Already have an account?
+
+<a href="/login">
+
+Login
+
+</a>
+
+</div>
+
+</div>
+
+</div>
+<script>
+
+const video = document.getElementById("video");
+const canvas = document.getElementById("canvas");
+const photoInput = document.getElementById("photo");
+
+navigator.mediaDevices.getUserMedia({
+    video: true
+})
+.then(stream => {
+    video.srcObject = stream;
+})
+.catch(err => {
+    alert("Camera permission denied or webcam not available.");
+});
+
+function capturePhoto(){
+
+    const ctx = canvas.getContext("2d");
+
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+
+    ctx.drawImage(video,0,0);
+
+    photoInput.value = canvas.toDataURL("image/png");
+
+    alert("Photo Captured Successfully!");
+}
+
+</script>
+</body>
+
+</html>

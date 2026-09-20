@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Dashboard | ExamGuard</title>
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/common.css') }}">
+
+<link rel="stylesheet"
+href="{{ url_for('static', filename='css/dashboard.css') }}">
+
+<link rel="stylesheet"
+href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+</head>
+
+<body>
+
+<div class="sidebar">
+
+<h2><i class="fa-solid fa-shield-halved"></i> ExamGuard</h2>
+
+<ul>
+
+<li class="active"><i class="fa-solid fa-house"></i> Dashboard</li>
+
+<li><i class="fa-solid fa-user"></i> Profile</li>
+
+<li><i class="fa-solid fa-camera"></i> Face Monitor</li>
+
+<li><i class="fa-solid fa-globe"></i> Browser Logs</li>
+
+<li><i class="fa-solid fa-chart-column"></i> Reports</li>
+
+<li><i class="fa-solid fa-gear"></i> Settings</li>
+
+<li>
+<a href="/logout">
+<i class="fa-solid fa-right-from-bracket"></i> Logout
+</a>
+</li>
+
+</ul>
+
+</div>
+
+<div class="main">
+
+<div class="topbar">
+
+<h1>Dashboard</h1>
+
+<div class="profile">
+
+<img
+    src="{{ url_for('static', filename='photos/' + photo) }}"
+    class="profile-image"
+    alt="Candidate Photo"
+>
+
+<div>
+
+<h3>{{ username }}</h3>
+
+<p>Candidate</p>
+
+</div>
+
+</div>
+
+</div>
+
+<div class="cards">
+
+    <!-- Candidate -->
+
+    <div class="card">
+
+        <i class="fa-solid fa-user-graduate"></i>
+
+        <h3>Candidate</h3>
+
+        <div class="info">
+
+            <p><strong>Name:</strong> {{ username }}</p>
+
+            <p><strong>ID:</strong> EG001</p>
+
+            <p><strong>Status:</strong>
+                <span class="green-dot"></span>
+                Registered
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- Face -->
+
+    <div class="card">
+
+        <i class="fa-solid fa-camera"></i>
+
+        <h3>Face Monitoring</h3>
+
+        <div class="info">
+
+            <p>Camera :
+                <span class="green-dot"></span>
+                Ready
+            </p>
+
+            <p>Detection :
+                {% if last_session %}
+                Completed
+                {% else %}
+                Waiting
+                {% endif %}
+            </p>
+
+            <p>Face :
+                {% if last_session %}
+                    {% if session_status == 'Suspicious' %}
+                    <span class="red-dot"></span>
+                    Anomalies Detected
+                    {% else %}
+                    <span class="green-dot"></span>
+                    Verified Secure
+                    {% endif %}
+                {% else %}
+                Not Started
+                {% endif %}
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- Browser -->
+
+    <div class="card">
+
+        <i class="fa-solid fa-globe"></i>
+
+        <h3>Browser Activity</h3>
+
+        <div class="info">
+
+            <p>Focus Loss : {{ focus_losses }}</p>
+
+            <p>Tab Switches : {{ tab_switches }}</p>
+
+            <p>Status :
+                {% if last_session %}
+                    {% if tab_switches > 3 or focus_losses > 4 %}
+                    <span class="red-dot"></span>
+                    Suspicious
+                    {% elif tab_switches > 0 or focus_losses > 0 %}
+                    <span class="orange-dot"></span>
+                    Minor Violations
+                    {% else %}
+                    <span class="green-dot"></span>
+                    Secure
+                    {% endif %}
+                {% else %}
+                <span class="green-dot"></span>
+                Secure
+                {% endif %}
+            </p>
+
+        </div>
+
+    </div>
+
+    <!-- Integrity -->
+
+    <div class="card">
+
+        <i class="fa-solid fa-shield-halved"></i>
+
+        <h3>Integrity Score</h3>
+
+        <div class="score-circle" style="border-color: {% if integrity_score >= 80 %}#22c55e{% elif integrity_score >= 50 %}#ffd43b{% else %}#ef4444{% endif %};">
+
+            <span>{{ integrity_score }}%</span>
+
+        </div>
+
+        <p class="risk" style="color: {% if integrity_score >= 80 %}#22c55e{% elif integrity_score >= 50 %}#ffd43b{% else %}#ef4444{% endif %};">
+
+            {% if integrity_score >= 80 %}
+            Low Risk
+            {% elif integrity_score >= 50 %}
+            Medium Risk
+            {% else %}
+            High Risk
+            {% endif %}
+
+        </p>
+
+    </div>
+
+</div>
+<div class="exam-box">
+
+<h2>Start Examination</h2>
+
+<p>
+
+Click the button below to begin your online examination.
+When the exam starts, the webcam, browser activity logging,
+and session tracking modules will automatically activate.
+
+</p>
+
+<a href="{{ url_for('auth.start_exam') }}" class="start-exam-btn">
+    Start Exam
+</a>
+
+</div>
+
+<div class="activity">
+
+<h2>Recent Activities</h2>
+
+<table>
+
+<tr>
+
+<th>Time</th>
+
+<th>Activity</th>
+
+<th>Status</th>
+
+</tr>
+
+{% if recent_logs %}
+    {% for log in recent_logs %}
+    <tr>
+    <td>{{ log.event_time }}</td>
+    <td>{{ log.event_type }}</td>
+    <td class="{% if 'Detected' in log.event_type or 'Gain' in log.event_type %}green{% elif 'Interaction' in log.event_type %}orange{% else %}red{% endif %}">
+        {% if 'Detected' in log.event_type or 'Gain' in log.event_type %}Normal{% elif 'Interaction' in log.event_type %}Info{% else %}Anomaly{% endif %}
+    </td>
+    </tr>
+    {% endfor %}
+{% else %}
+    <tr>
+    <td>Today</td>
+    <td>Candidate Registration</td>
+    <td class="green">Completed</td>
+    </tr>
+    <tr>
+    <td>Today</td>
+    <td>Candidate Login</td>
+    <td class="green">Completed</td>
+    </tr>
+{% endif %}
+
+</table>
+
+</div>
+
+<!-- Current Exam Session -->
+
+<div class="activity" style="margin-top:30px;">
+
+    <h2>
+        <i class="fa-solid fa-file-circle-check"></i>
+        Current Exam Session
+    </h2>
+
+    <table>
+
+        <tr>
+            <th>Details</th>
+            <th>Information</th>
+        </tr>
+
+        <tr>
+            <td>Exam Name</td>
+            <td>Python Programming Assessment</td>
+        </tr>
+
+        <tr>
+            <td>Session Status</td>
+            <td class="{% if session_status == 'Completed' %}green{% elif session_status == 'Suspicious' %}red{% else %}orange{% endif %}">
+                {{ session_status }}
+            </td>
+        </tr>
+
+        <tr>
+            <td>Duration</td>
+            <td>30 Minutes</td>
+        </tr>
+
+        <tr>
+            <td>Start Time</td>
+            <td>{{ start_time }}</td>
+        </tr>
+
+        <tr>
+            <td>End Time</td>
+            <td>{{ end_time }}</td>
+        </tr>
+
+    </table>
+
+</div>
+
+<!-- Exam Instructions -->
+
+<div class="activity" style="margin-top:30px;">
+
+    <h2>
+        <i class="fa-solid fa-circle-info"></i>
+        Exam Instructions
+    </h2>
+
+    <ul class="instructions">
+
+        <li>Keep your face visible throughout the examination.</li>
+
+        <li>Do not switch browser tabs during the exam.</li>
+
+        <li>Ensure a stable internet connection.</li>
+
+        <li>Do not refresh or close the browser window.</li>
+
+        <li>Click <strong>Start Exam</strong> only when you are ready.</li>
+
+    </ul>
+
+</div>
+
+</div>
+
+</body>
+
+</html>

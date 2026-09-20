@@ -1,0 +1,503 @@
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial;
+}
+
+body{
+
+background:#eef2ff;
+
+}
+
+.exam-container{
+
+width:80%;
+margin:30px auto;
+
+}
+
+.header{
+
+display:flex;
+justify-content:space-between;
+align-items:center;
+
+background:white;
+
+padding:20px;
+
+border-radius:10px;
+
+box-shadow:0 0 10px #ccc;
+
+}
+
+.timer{
+
+background:#2563eb;
+
+color:white;
+
+padding:15px;
+
+border-radius:10px;
+
+text-align:center;
+
+}
+
+.status{
+
+margin-top:20px;
+
+background:white;
+
+padding:15px;
+
+display:flex;
+
+justify-content:space-around;
+
+border-radius:10px;
+
+box-shadow:0 0 10px #ccc;
+
+}
+
+.question-card{
+
+margin-top:20px;
+
+background:white;
+
+padding:25px;
+
+border-radius:10px;
+
+box-shadow:0 0 10px #ccc;
+
+}
+
+.question-card label{
+
+display:block;
+
+padding:15px;
+
+margin-top:12px;
+
+border:1px solid #ddd;
+
+border-radius:8px;
+
+cursor:pointer;
+
+}
+
+.question-card label:hover{
+
+background:#dbeafe;
+
+}
+
+.buttons{
+
+margin-top:30px;
+
+display:flex;
+
+justify-content:space-between;
+
+}
+
+.buttons button{
+
+padding:12px 25px;
+
+border:none;
+
+background:#2563eb;
+
+color:white;
+
+border-radius:8px;
+
+cursor:pointer;
+
+}
+
+.palette{
+
+margin-top:25px;
+
+background:white;
+
+padding:20px;
+
+border-radius:10px;
+
+box-shadow:0 0 10px #ccc;
+
+}
+
+.numbers{
+
+display:grid;
+
+grid-template-columns:repeat(5,60px);
+
+gap:15px;
+
+margin-top:20px;
+
+}
+
+.numbers span{
+
+width:50px;
+
+height:50px;
+
+display:flex;
+
+justify-content:center;
+
+align-items:center;
+
+background:#ddd;
+
+border-radius:8px;
+
+font-weight:bold;
+
+cursor:pointer;
+
+transition:background 0.2s, color 0.2s;
+
+}
+
+.numbers span:hover{
+
+background:#cbd5e1;
+
+}
+
+.active{
+
+background:#2563eb!important;
+
+color:white;
+
+}
+
+.numbers span.active:hover{
+
+background:#1d4ed8!important;
+
+}
+
+.answered{
+
+background:#10b981!important;
+
+color:white;
+
+}
+
+.answered:hover{
+
+background:#059669!important;
+
+}
+
+/* =====================================================
+   MONITORING ALERT POPUP
+===================================================== */
+
+.monitor-alert {
+    position: fixed;
+    inset: 0;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    background: rgba(0, 0, 0, 0.65);
+
+    z-index: 99999;
+
+    opacity: 0;
+    visibility: hidden;
+
+    transition:
+        opacity 0.25s ease,
+        visibility 0.25s ease;
+}
+
+
+.monitor-alert.show {
+    opacity: 1;
+    visibility: visible;
+}
+
+
+.monitor-alert-box {
+
+    width: 420px;
+    max-width: 90%;
+
+    background: white;
+
+    border-radius: 16px;
+
+    padding: 30px;
+
+    text-align: center;
+
+    position: relative;
+
+    box-shadow:
+        0 20px 60px rgba(0, 0, 0, 0.35);
+
+    transform: scale(0.85);
+
+    transition: transform 0.25s ease;
+}
+
+
+.monitor-alert.show .monitor-alert-box {
+    transform: scale(1);
+}
+
+
+.monitor-alert-icon {
+
+    font-size: 52px;
+
+    margin-bottom: 10px;
+}
+
+
+.monitor-alert-box h2 {
+
+    margin: 10px 0;
+
+    font-size: 24px;
+
+    color: #222;
+}
+
+
+.monitor-alert-box p {
+
+    margin: 10px 0 25px;
+
+    font-size: 16px;
+
+    line-height: 1.5;
+
+    color: #555;
+}
+
+
+.monitor-alert-close {
+
+    position: absolute;
+
+    top: 10px;
+    right: 15px;
+
+    border: none;
+
+    background: transparent;
+
+    font-size: 28px;
+
+    cursor: pointer;
+
+    color: #777;
+}
+
+
+.monitor-alert-close:hover {
+    color: #222;
+}
+
+
+.monitor-alert-ok {
+
+    border: none;
+
+    padding: 10px 30px;
+
+    border-radius: 8px;
+
+    background: #dc3545;
+
+    color: white;
+
+    font-size: 15px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.monitor-alert-ok:hover {
+    background: #bb2d3b;
+}
+
+.camera-box {
+    position: fixed;
+    right: 20px;
+    top: 120px;
+
+    width: 300px;
+    max-height: calc(100vh - 140px);
+
+    background: white;
+    border-radius: 10px;
+    padding: 12px;
+
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+
+    z-index: 1000;
+
+    overflow-y: auto;
+}
+
+/* Keep the camera inside the monitoring panel */
+.camera-box img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 220px;
+    object-fit: cover;
+}
+
+/* Give the exam content space on the right */
+.exam-container {
+    margin-right: 340px;
+}
+/* =====================================================
+   EXAM SUBMISSION CONFIRMATION MODAL
+===================================================== */
+
+.submit-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+
+    background: rgba(0, 0, 0, 0.55);
+
+    z-index: 9999;
+
+    align-items: center;
+    justify-content: center;
+}
+
+.submit-modal.show {
+    display: flex;
+}
+
+.submit-modal-box {
+    width: 450px;
+    max-width: 90%;
+
+    background: white;
+    border-radius: 14px;
+
+    padding: 30px;
+
+    text-align: center;
+
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+
+    animation: submitModalIn 0.2s ease-out;
+}
+
+@keyframes submitModalIn {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+.submit-modal-icon {
+    font-size: 42px;
+    margin-bottom: 10px;
+}
+
+.submit-modal-box h2 {
+    margin: 5px 0 15px;
+    color: #1f2937;
+}
+
+.submit-modal-box p {
+    color: #4b5563;
+    line-height: 1.5;
+    margin: 8px 0;
+}
+
+.submit-modal-warning {
+    margin-top: 18px;
+    padding: 14px;
+
+    background: #fff7ed;
+    border-left: 4px solid #f59e0b;
+
+    border-radius: 6px;
+
+    text-align: left;
+
+    color: #7c2d12;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.submit-modal-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+
+    margin-top: 25px;
+}
+
+.cancel-submit-btn,
+.confirm-submit-btn {
+    border: none;
+    border-radius: 7px;
+
+    padding: 11px 25px;
+
+    font-size: 15px;
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+.cancel-submit-btn {
+    background: #e5e7eb;
+    color: #374151;
+}
+
+.cancel-submit-btn:hover {
+    background: #d1d5db;
+}
+
+.confirm-submit-btn {
+    background: #2563eb;
+    color: white;
+}
+
+.confirm-submit-btn:hover {
+    background: #1d4ed8;
+}

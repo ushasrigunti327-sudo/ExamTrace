@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | ExamGuard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        body {
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+        }
+        .admin-login-card {
+            background: #ffffff;
+            width: 100%;
+            max-width: 420px;
+            border-radius: 16px;
+            padding: 35px 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            text-align: center;
+        }
+        .brand-icon {
+            width: 60px;
+            height: 60px;
+            background: #eff6ff;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 28px;
+            color: #2563eb;
+            margin-bottom: 15px;
+            box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+        }
+        h1 {
+            font-size: 22px;
+            color: #0f172a;
+            margin: 0 0 6px 0;
+        }
+        .subtitle {
+            color: #64748b;
+            font-size: 13.5px;
+            margin-bottom: 25px;
+        }
+        .flash-msg {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .form-group {
+            text-align: left;
+            margin-bottom: 18px;
+        }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 6px;
+        }
+        .input-wrapper {
+            position: relative;
+        }
+        .input-wrapper i {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #94a3b8;
+            font-size: 15px;
+        }
+        .form-control {
+            width: 100%;
+            padding: 11px 14px 11px 40px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 14px;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .form-control:focus {
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+        }
+        .btn-submit {
+            width: 100%;
+            padding: 12px;
+            background: #2563eb;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-top: 10px;
+        }
+        .btn-submit:hover {
+            background: #1d4ed8;
+        }
+        .footer-links {
+            margin-top: 25px;
+            font-size: 13px;
+            color: #64748b;
+            border-top: 1px solid #f1f5f9;
+            padding-top: 18px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .footer-links a {
+            color: #2563eb;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .footer-links a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+
+<div class="admin-login-card">
+    <div class="brand-icon">
+        <i class="fa-solid fa-shield-halved"></i>
+    </div>
+    <h1>Invigilator Portal</h1>
+    <div class="subtitle">Secure administrative access to ExamGuard</div>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    {% for message in messages %}
+    <div class="flash-msg">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span>{{ message }}</span>
+    </div>
+    {% endfor %}
+    {% endif %}
+    {% endwith %}
+
+    <form method="POST" action="/admin/login">
+        <div class="form-group">
+            <label for="email">Admin Email</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-envelope"></i>
+                <input type="email" id="email" name="email" class="form-control" placeholder="admin@examguard.com" required autocomplete="username">
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="password">Password</label>
+            <div class="input-wrapper">
+                <i class="fa-solid fa-lock"></i>
+                <input type="password" id="password" name="password" class="form-control" placeholder="••••••••" required autocomplete="current-password">
+            </div>
+        </div>
+
+        <button type="submit" class="btn-submit">
+            <i class="fa-solid fa-right-to-bracket"></i> Login to Dashboard
+        </button>
+    </form>
+
+    <div class="footer-links">
+        <a href="/login"><i class="fa-solid fa-user-graduate"></i> Candidate Login</a>
+        <a href="/"><i class="fa-solid fa-house"></i> Home</a>
+    </div>
+</div>
+
+</body>
+</html>

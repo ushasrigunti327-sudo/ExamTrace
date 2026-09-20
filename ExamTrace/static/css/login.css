@@ -1,0 +1,145 @@
+/* ==========================================
+   EXAMGUARD LOGIN PAGE
+========================================== */
+
+.login-page{
+
+    min-height:100vh;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    padding:120px 20px;
+
+}
+
+.login-box{
+
+    width:100%;
+
+    max-width:480px;
+
+    padding:45px;
+
+    background:rgba(255,255,255,.12);
+
+    backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.18);
+
+    border-radius:25px;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.25);
+
+    animation:fadeUp .8s;
+
+}
+
+.login-box h1{
+
+    text-align:center;
+
+    color:white;
+
+    margin-bottom:10px;
+
+    font-size:34px;
+
+}
+
+.login-box p{
+
+    text-align:center;
+
+    color:#dbeafe;
+
+    margin-bottom:35px;
+
+}
+
+.form-group{
+
+    margin-bottom:20px;
+
+}
+
+.form-group label{
+
+    display:block;
+
+    margin-bottom:8px;
+
+    color:white;
+
+    font-weight:500;
+
+}
+
+.login-btn{
+
+    width:100%;
+
+    margin-top:10px;
+
+}
+
+.extra-links{
+
+    display:flex;
+
+    justify-content:space-between;
+
+    margin-top:25px;
+
+}
+
+.extra-links a{
+
+    color:#7dd3fc;
+
+    text-decoration:none;
+
+    font-weight:500;
+
+}
+
+.extra-links a:hover{
+
+    color:white;
+
+}
+
+.flash{
+
+    padding:14px;
+
+    margin-bottom:20px;
+
+    text-align:center;
+
+    border-radius:10px;
+
+    color:white;
+
+    background:#dc2626;
+
+}
+
+@media(max-width:768px){
+
+.login-box{
+
+padding:30px;
+
+}
+
+.login-box h1{
+
+font-size:28px;
+
+}
+
+}

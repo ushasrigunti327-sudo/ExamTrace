@@ -1,0 +1,1741 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
+
+    <title>Python Online Examination</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/exam.css') }}">
+
+</head>
+
+<body>
+
+<div class="exam-container">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="header">
+
+        <div>
+
+            <h2>Python Online Examination</h2>
+
+            <p>
+                Candidate : {{ username }}
+            </p>
+
+        </div>
+
+        <div class="timer">
+
+            <h3 id="countdown">
+                30:00
+            </h3>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         STATUS
+    ====================================================== -->
+
+    <div class="status">
+
+        <span>
+            📷 Camera :
+            <b>Active</b>
+        </span>
+
+        <span>
+            🙂 Face :
+            <b id="headerFaceStatus">
+                {{ monitor.face_status }}
+            </b>
+        </span>
+
+    </div>
+
+
+    <!-- =====================================================
+         QUESTION
+    ====================================================== -->
+
+    <div class="question-card">
+
+        <h3 id="questionTitle">
+
+            Question {{ current }} of {{ total }}
+
+        </h3>
+
+        <hr>
+
+        <br>
+
+        <h2 id="questionText">
+
+            {{ question["question"] }}
+
+        </h2>
+
+        <br>
+
+
+        <form id="questionForm"
+              method="POST">
+
+
+            <!-- OPTION 1 -->
+
+            <label>
+
+                <input
+                    type="radio"
+                    name="answer"
+                    value="{{ question['option1'] }}"
+                    id="opt1"
+                    {% if saved_answer == question['option1'] %}
+                    checked
+                    {% endif %}
+                >
+
+                <span id="opt1Text">
+                    {{ question["option1"] }}
+                </span>
+
+            </label>
+
+
+            <!-- OPTION 2 -->
+
+            <label>
+
+                <input
+                    type="radio"
+                    name="answer"
+                    value="{{ question['option2'] }}"
+                    id="opt2"
+                    {% if saved_answer == question['option2'] %}
+                    checked
+                    {% endif %}
+                >
+
+                <span id="opt2Text">
+                    {{ question["option2"] }}
+                </span>
+
+            </label>
+
+
+            <!-- OPTION 3 -->
+
+            <label>
+
+                <input
+                    type="radio"
+                    name="answer"
+                    value="{{ question['option3'] }}"
+                    id="opt3"
+                    {% if saved_answer == question['option3'] %}
+                    checked
+                    {% endif %}
+                >
+
+                <span id="opt3Text">
+                    {{ question["option3"] }}
+                </span>
+
+            </label>
+
+
+            <!-- OPTION 4 -->
+
+            <label>
+
+                <input
+                    type="radio"
+                    name="answer"
+                    value="{{ question['option4'] }}"
+                    id="opt4"
+                    {% if saved_answer == question['option4'] %}
+                    checked
+                    {% endif %}
+                >
+
+                <span id="opt4Text">
+                    {{ question["option4"] }}
+                </span>
+
+            </label>
+
+
+            <!-- =================================================
+                 BUTTONS
+            ================================================== -->
+
+            <div class="buttons">
+
+
+                <!-- PREVIOUS -->
+
+                <button
+                    type="button"
+                    id="prevBtn"
+                    onclick="navigateQuestion('previous')"
+                    {% if current <= 1 %}
+                    style="display:none;"
+                    {% endif %}
+                >
+
+                    Previous
+
+                </button>
+
+
+                <!-- NEXT -->
+
+                <button
+                    type="button"
+                    id="nextBtn"
+                    onclick="navigateQuestion('next')"
+                    {% if current >= total %}
+                    style="display:none;"
+                    {% endif %}
+                >
+
+                    Next
+
+                </button>
+
+
+                <!-- SUBMIT -->
+
+                <button
+                    type="button"
+                    id="openSubmitBtn"
+                    {% if total > current %}
+                    style="display:none;"
+                    {% endif %}
+                >
+
+                    Submit Exam
+
+                </button>
+
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    <!-- =====================================================
+         QUESTION PALETTE
+    ====================================================== -->
+
+    <div class="palette">
+
+        <h3>
+            Question Palette
+        </h3>
+
+
+        <div
+            class="numbers"
+            id="paletteNumbers"
+        >
+
+            {% for i in range(1, total + 1) %}
+
+                {% set q_id_str = questions[i-1]['id']|string %}
+
+                {% set is_answered = q_id_str in answers %}
+
+
+                <span
+                    class="palette-num
+                    {% if i == current %}
+                    active
+                    {% elif is_answered %}
+                    answered
+                    {% endif %}"
+                    data-index="{{ i - 1 }}"
+                    onclick="jumpToQuestion(parseInt(this.dataset.index))"
+                >
+
+                    {{ i }}
+
+                </span>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     LIVE MONITORING
+========================================================= -->
+
+<div class="camera-box">
+
+    <h3>
+        📷 Live Monitoring
+    </h3>
+
+
+    <!-- CAMERA -->
+
+    <img
+        src="{{ url_for('auth.video_feed') }}"
+        width="350"
+        height="260"
+        alt="Live camera feed"
+    >
+
+
+    <hr>
+
+
+    <!-- FACE STATUS -->
+
+    <p>
+
+        <b>
+            Face Status :
+        </b>
+
+        <span id="faceStatus">
+
+            {{ monitor.face_status }}
+
+        </span>
+
+    </p>
+
+
+    <!-- FACE MISSING -->
+
+    <p>
+
+        <b>
+            Face Missing :
+        </b>
+
+        <span id="missingCount">
+
+            {{ monitor.face_missing_count }}
+
+        </span>
+
+    </p>
+
+
+    <!-- MULTIPLE FACE -->
+
+    <p>
+
+        <b>
+            Multiple Faces :
+        </b>
+
+        <span id="multipleCount">
+
+            {{ monitor.multiple_face_count }}
+
+        </span>
+
+    </p>
+
+
+    <!-- TAB SWITCH -->
+
+    <p>
+
+        <b>
+            Tab Switch :
+        </b>
+
+        <span id="tabCount">
+
+            {{ monitor.tab_switch_count }}
+
+        </span>
+
+    </p>
+
+
+    <!-- FOCUS LOSS -->
+
+    <p>
+
+        <b>
+            Focus Loss :
+        </b>
+
+        <span id="focusLossCount">
+
+            {{ monitor.focus_loss_count }}
+
+        </span>
+
+    </p>
+
+
+    <!-- RIGHT CLICK -->
+
+    <p>
+
+        <b>
+            Right Click :
+        </b>
+
+        <span id="rightClickCount">
+
+            {{ monitor.right_click_count }}
+
+        </span>
+
+    </p>
+
+
+    <!-- COPY -->
+
+    <p>
+
+        <b>
+            Copy :
+        </b>
+
+        <span id="copyCount">
+
+            {{ monitor.copy_count }}
+
+        </span>
+
+    </p>
+
+
+    <!-- PASTE -->
+
+    <p>
+
+        <b>
+            Paste :
+        </b>
+
+        <span id="pasteCount">
+
+            {{ monitor.paste_count }}
+
+        </span>
+
+    </p>
+
+
+    <!-- SHORTCUT -->
+
+    <p>
+
+        <b>
+            Keyboard Shortcuts :
+        </b>
+
+        <span id="shortcutCount">
+
+            {{ monitor.shortcut_count }}
+
+        </span>
+
+    </p>
+
+
+    <!-- INTEGRITY -->
+
+    <p>
+
+        <b>
+            Integrity Score :
+        </b>
+
+        <span id="integrityScore">
+
+            {{ monitor.integrity_score }}%
+
+        </span>
+
+    </p>
+
+</div>
+
+
+
+<!-- =========================================================
+     MONITORING ALERT POPUP
+========================================================= -->
+
+<div
+    id="monitorAlert"
+    class="monitor-alert"
+>
+
+    <div class="monitor-alert-box">
+
+
+        <button
+            type="button"
+            class="monitor-alert-close"
+            onclick="closeMonitorAlert()"
+            aria-label="Close"
+        >
+
+            ×
+
+        </button>
+
+
+        <div
+            id="alertIcon"
+            class="monitor-alert-icon"
+        >
+
+            ⚠️
+
+        </div>
+
+
+        <h2 id="alertTitle">
+
+            Monitoring Alert
+
+        </h2>
+
+
+        <p id="alertMessage">
+
+            A monitoring event was detected.
+
+        </p>
+
+
+        <button
+            type="button"
+            class="monitor-alert-ok"
+            onclick="closeMonitorAlert()"
+        >
+
+            OK
+
+        </button>
+
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     SUBMIT CONFIRMATION MODAL
+========================================================= -->
+
+<div
+    id="submitModal"
+    class="submit-modal"
+>
+
+    <div class="submit-modal-box">
+
+
+        <div class="submit-modal-icon">
+
+            ⚠️
+
+        </div>
+
+
+        <h2>
+            Submit Examination?
+        </h2>
+
+
+        <p>
+
+            You are about to submit your examination.
+
+        </p>
+
+
+        <p>
+
+            Once submitted, you will not be able to
+            return to the questions or change your answers.
+
+        </p>
+
+
+        <div class="submit-modal-warning">
+
+            <strong>
+                Monitoring Notice
+            </strong>
+
+            <br>
+
+            Your answers and examination monitoring events
+            will be recorded for the final integrity evaluation.
+
+        </div>
+
+
+        <div class="submit-modal-buttons">
+
+
+            <button
+                type="button"
+                id="cancelSubmitBtn"
+                class="cancel-submit-btn"
+            >
+
+                Cancel
+
+            </button>
+
+
+            <button
+                type="button"
+                id="confirmSubmitBtn"
+                class="confirm-submit-btn"
+            >
+
+                Submit Exam
+
+            </button>
+
+
+        </div>
+
+    </div>
+
+</div>
+
+
+
+<!-- =========================================================
+     QUESTIONS DATA
+========================================================= -->
+
+<script type="application/json"
+        id="questions-data">
+
+    {{ questions | tojson | safe }}
+
+</script>
+
+
+
+<script>
+
+    // =====================================================
+    // BASIC VARIABLES
+    // =====================================================
+
+    let time =
+        parseInt("{{ remaining_seconds }}") || 0;
+
+    /*
+     * Internal question navigation causes the page to reload.
+     * Some browsers fire visibilitychange/blur while that reload
+     * happens, which can be incorrectly recorded as a tab switch.
+     *
+     * sessionStorage keeps this flag across the reload, so the
+     * browser events caused by Next/Previous/Jump/Submit are ignored.
+     * It is cleared immediately when the new exam page loads, so a
+     * real tab switch after that is still recorded normally.
+     */
+    const INTERNAL_NAVIGATION_KEY =
+        "exam_internal_navigation";
+
+    let isNavigating = false;
+
+    try {
+        if (
+            sessionStorage.getItem(
+                INTERNAL_NAVIGATION_KEY
+            ) === "true"
+        ) {
+            sessionStorage.removeItem(
+                INTERNAL_NAVIGATION_KEY
+            );
+        }
+    } catch (error) {
+        console.log(
+            "Navigation state storage unavailable:",
+            error
+        );
+    }
+
+    function markInternalNavigation() {
+
+        isNavigating = true;
+
+        try {
+            sessionStorage.setItem(
+                INTERNAL_NAVIGATION_KEY,
+                "true"
+            );
+        } catch (error) {
+            console.log(
+                "Could not store navigation state:",
+                error
+            );
+        }
+    }
+
+    function clearInternalNavigation() {
+
+        isNavigating = false;
+
+        try {
+            sessionStorage.removeItem(
+                INTERNAL_NAVIGATION_KEY
+            );
+        } catch (error) {
+            console.log(
+                "Could not clear navigation state:",
+                error
+            );
+        }
+    }
+
+
+    const countdownEl =
+        document.getElementById("countdown");
+
+
+    const formEl =
+        document.getElementById("questionForm");
+
+
+
+    // =====================================================
+    // TIMER
+    // =====================================================
+
+    const timerInterval = setInterval(function () {
+
+
+        if (time <= 0) {
+
+            clearInterval(timerInterval);
+
+
+            alert(
+                "Time is up! Your examination will be submitted automatically."
+            );
+
+
+            formEl.action =
+                "{{ url_for('auth.submit_exam') }}";
+
+
+            formEl.submit();
+
+
+            return;
+
+        }
+
+
+        let minutes =
+            Math.floor(time / 60);
+
+
+        let seconds =
+            time % 60;
+
+
+        countdownEl.textContent =
+            minutes +
+            ":" +
+            (seconds < 10 ? "0" : "") +
+            seconds;
+
+
+        time--;
+
+    }, 1000);
+
+
+
+    // =====================================================
+    // MONITORING POPUP
+    // =====================================================
+
+    function showMonitorAlert(
+        title,
+        message,
+        icon = "⚠️"
+    ) {
+
+        const popup =
+            document.getElementById("monitorAlert");
+
+
+        const alertTitle =
+            document.getElementById("alertTitle");
+
+
+        const alertMessage =
+            document.getElementById("alertMessage");
+
+
+        const alertIcon =
+            document.getElementById("alertIcon");
+
+
+        if (!popup) {
+            return;
+        }
+
+
+        alertTitle.textContent =
+            title;
+
+
+        alertMessage.textContent =
+            message;
+
+
+        alertIcon.textContent =
+            icon;
+
+
+        popup.classList.add("show");
+
+    }
+
+
+
+    function closeMonitorAlert() {
+
+        const popup =
+            document.getElementById("monitorAlert");
+
+
+        if (popup) {
+
+            popup.classList.remove("show");
+
+        }
+
+    }
+
+
+
+    // =====================================================
+    // SEND BROWSER EVENT
+    // =====================================================
+
+    function sendEvent(eventName) {
+
+        fetch(
+            "{{ url_for('auth.browser_event') }}",
+            {
+
+                method: "POST",
+
+                headers: {
+                    "Content-Type": "application/json"
+                },
+
+                body: JSON.stringify({
+                    event: eventName
+                })
+
+            }
+        )
+
+        .then(function(response) {
+
+            if (!response.ok) {
+                throw new Error(
+                    "Browser event failed"
+                );
+            }
+
+            return response.json();
+
+        })
+
+        .then(function(data) {
+
+            /*
+             * Immediately update the displayed
+             * integrity score when the backend
+             * returns it.
+             */
+
+            if (
+                data &&
+                data.integrity_score !== undefined
+            ) {
+
+                const score =
+                    document.getElementById(
+                        "integrityScore"
+                    );
+
+
+                if (score) {
+
+                    score.textContent =
+                        data.integrity_score + "%";
+
+                }
+
+            }
+
+        })
+
+        .catch(function(error) {
+
+            console.log(
+                "Event logging error:",
+                error
+            );
+
+        });
+
+    }
+
+
+
+    // =====================================================
+    // TAB SWITCH
+    // =====================================================
+
+    document.addEventListener(
+        "visibilitychange",
+        function() {
+
+
+            if (isNavigating) {
+                return;
+            }
+
+
+            if (document.hidden) {
+
+                sendEvent(
+                    "Tab Switch"
+                );
+
+
+                showMonitorAlert(
+                    "Tab Switch Detected",
+                    "You left the examination tab. This activity has been recorded.",
+                    "⚠️"
+                );
+
+            }
+
+        }
+    );
+
+
+
+    // =====================================================
+    // WINDOW FOCUS LOSS
+    // =====================================================
+
+    window.addEventListener(
+        "blur",
+        function() {
+
+
+            if (isNavigating) {
+                return;
+            }
+
+
+            sendEvent(
+                "Focus Lost"
+            );
+
+
+            showMonitorAlert(
+                "Focus Lost",
+                "The examination window lost focus. This activity has been recorded.",
+                "⚠️"
+            );
+
+        }
+    );
+
+
+
+    // =====================================================
+    // RIGHT CLICK
+    // =====================================================
+
+    document.addEventListener(
+        "contextmenu",
+        function(e) {
+
+
+            e.preventDefault();
+
+
+            if (isNavigating) {
+                return;
+            }
+
+
+            sendEvent(
+                "Right Click"
+            );
+
+
+            showMonitorAlert(
+                "Right Click Detected",
+                "Right-clicking is restricted during the examination. This activity has been recorded.",
+                "🖱️"
+            );
+
+        }
+    );
+
+
+
+    // =====================================================
+    // COPY
+    // =====================================================
+
+    document.addEventListener(
+        "copy",
+        function(e) {
+
+
+            if (isNavigating) {
+                return;
+            }
+
+
+            sendEvent(
+                "Copy Attempt"
+            );
+
+
+            showMonitorAlert(
+                "Copy Attempt Detected",
+                "Copying examination content is restricted. This activity has been recorded.",
+                "📋"
+            );
+
+        }
+    );
+
+
+
+    // =====================================================
+    // PASTE
+    // =====================================================
+
+    document.addEventListener(
+        "paste",
+        function(e) {
+
+
+            if (isNavigating) {
+                return;
+            }
+
+
+            sendEvent(
+                "Paste Attempt"
+            );
+
+
+            showMonitorAlert(
+                "Paste Attempt Detected",
+                "Pasting content into the examination is restricted. This activity has been recorded.",
+                "📥"
+            );
+
+        }
+    );
+
+
+
+    // =====================================================
+    // KEYBOARD SHORTCUT
+    // =====================================================
+
+    document.addEventListener(
+        "keydown",
+        function(e) {
+
+
+            if (isNavigating) {
+                return;
+            }
+
+
+            let monitoredShortcut = false;
+
+
+            /*
+             * Ctrl + key
+             */
+
+            if (e.ctrlKey) {
+                monitoredShortcut = true;
+            }
+
+
+            /*
+             * Ctrl + Shift + key
+             */
+
+            if (
+                e.ctrlKey &&
+                e.shiftKey
+            ) {
+                monitoredShortcut = true;
+            }
+
+
+            /*
+             * Alt + key
+             */
+
+            if (e.altKey) {
+                monitoredShortcut = true;
+            }
+
+
+            /*
+             * Function keys
+             */
+
+            if (
+                e.key &&
+                /^F([1-9]|1[0-2])$/.test(e.key)
+            ) {
+                monitoredShortcut = true;
+            }
+
+
+            if (monitoredShortcut) {
+
+
+                sendEvent(
+                    "Keyboard Shortcut"
+                );
+
+
+                showMonitorAlert(
+                    "Keyboard Shortcut Detected",
+                    "A monitored keyboard shortcut was pressed during the examination. This activity has been recorded.",
+                    "⌨️"
+                );
+
+            }
+
+        }
+    );
+
+
+
+    // =====================================================
+    // REAL-TIME MONITOR STATUS
+    // =====================================================
+
+    setInterval(function() {
+
+
+        fetch(
+            "{{ url_for('auth.monitor_status') }}"
+        )
+
+        .then(function(response) {
+
+            if (!response.ok) {
+
+                throw new Error(
+                    "Monitor status request failed"
+                );
+
+            }
+
+            return response.json();
+
+        })
+
+        .then(function(data) {
+
+
+            if (data.error) {
+                return;
+            }
+
+
+            // ---------------------------------------------
+            // FACE STATUS
+            // ---------------------------------------------
+
+            const faceStatus =
+                document.getElementById(
+                    "faceStatus"
+                );
+
+
+            const headerFaceStatus =
+                document.getElementById(
+                    "headerFaceStatus"
+                );
+
+
+            if (faceStatus) {
+
+                faceStatus.textContent =
+                    data.face_status;
+
+            }
+
+
+            if (headerFaceStatus) {
+
+                headerFaceStatus.textContent =
+                    data.face_status;
+
+            }
+
+
+
+            // ---------------------------------------------
+            // FACE MISSING
+            // ---------------------------------------------
+
+            const missingCount =
+                document.getElementById(
+                    "missingCount"
+                );
+
+
+            if (missingCount) {
+
+                missingCount.textContent =
+                    data.face_missing_count;
+
+            }
+
+
+
+            // ---------------------------------------------
+            // MULTIPLE FACE
+            // ---------------------------------------------
+
+            const multipleCount =
+                document.getElementById(
+                    "multipleCount"
+                );
+
+
+            if (multipleCount) {
+
+                multipleCount.textContent =
+                    data.multiple_face_count;
+
+            }
+
+
+
+            // ---------------------------------------------
+            // TAB SWITCH
+            // ---------------------------------------------
+
+            const tabCount =
+                document.getElementById(
+                    "tabCount"
+                );
+
+
+            if (tabCount) {
+
+                tabCount.textContent =
+                    data.tab_switch_count;
+
+            }
+
+
+
+            // ---------------------------------------------
+            // FOCUS LOSS
+            // ---------------------------------------------
+
+            const focusLossCount =
+                document.getElementById(
+                    "focusLossCount"
+                );
+
+
+            if (focusLossCount) {
+
+                focusLossCount.textContent =
+                    data.focus_loss_count;
+
+            }
+
+
+
+            // ---------------------------------------------
+            // RIGHT CLICK
+            // ---------------------------------------------
+
+            const rightClickCount =
+                document.getElementById(
+                    "rightClickCount"
+                );
+
+
+            if (rightClickCount) {
+
+                rightClickCount.textContent =
+                    data.right_click_count;
+
+            }
+
+
+
+            // ---------------------------------------------
+            // COPY
+            // ---------------------------------------------
+
+            const copyCount =
+                document.getElementById(
+                    "copyCount"
+                );
+
+
+            if (copyCount) {
+
+                copyCount.textContent =
+                    data.copy_count;
+
+            }
+
+
+
+            // ---------------------------------------------
+            // PASTE
+            // ---------------------------------------------
+
+            const pasteCount =
+                document.getElementById(
+                    "pasteCount"
+                );
+
+
+            if (pasteCount) {
+
+                pasteCount.textContent =
+                    data.paste_count;
+
+            }
+
+
+
+            // ---------------------------------------------
+            // KEYBOARD SHORTCUT
+            // ---------------------------------------------
+
+            const shortcutCount =
+                document.getElementById(
+                    "shortcutCount"
+                );
+
+
+            if (shortcutCount) {
+
+                shortcutCount.textContent =
+                    data.shortcut_count;
+
+            }
+
+
+
+            // ---------------------------------------------
+            // INTEGRITY SCORE
+            // ---------------------------------------------
+
+            const integrityScore =
+                document.getElementById(
+                    "integrityScore"
+                );
+
+
+            if (integrityScore) {
+
+                integrityScore.textContent =
+                    data.integrity_score + "%";
+
+            }
+
+        })
+
+        .catch(function(error) {
+
+            console.log(
+                "Monitoring status error:",
+                error
+            );
+
+        });
+
+
+    }, 1000);
+
+
+
+    // =====================================================
+    // QUESTION DATA
+    // =====================================================
+
+    const questions =
+        JSON.parse(
+            document.getElementById(
+                "questions-data"
+            ).textContent
+        );
+
+
+    let currentQuestion =
+        Number("{{ current }}") - 1;
+
+
+
+    // =====================================================
+    // NAVIGATE QUESTION
+    // =====================================================
+
+    function navigateQuestion(direction) {
+
+
+        markInternalNavigation();
+
+
+        const form =
+            document.getElementById(
+                "questionForm"
+            );
+
+
+        const data =
+            new FormData(form);
+
+
+        fetch(
+            "{{ url_for('auth.save_answer') }}",
+            {
+
+                method: "POST",
+
+                body: data
+
+            }
+        )
+
+        .then(function() {
+
+            return fetch(
+                "{{ url_for('auth.navigate_question') }}",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+                        direction: direction
+                    })
+
+                }
+            );
+
+        })
+
+        .then(function() {
+
+            setTimeout(function() {
+
+                location.reload();
+
+            }, 100);
+
+        })
+
+        .catch(function(error) {
+
+            console.log(
+                "Navigation error:",
+                error
+            );
+
+            clearInternalNavigation();
+
+        });
+
+    }
+
+
+
+    // =====================================================
+    // JUMP TO QUESTION
+    // =====================================================
+
+    function jumpToQuestion(index) {
+
+
+        markInternalNavigation();
+
+
+        const form =
+            document.getElementById(
+                "questionForm"
+            );
+
+
+        const data =
+            new FormData(form);
+
+
+        fetch(
+            "{{ url_for('auth.save_answer') }}",
+            {
+
+                method: "POST",
+
+                body: data
+
+            }
+        )
+
+        .then(function() {
+
+            return fetch(
+                "{{ url_for('auth.navigate_question') }}",
+                {
+
+                    method: "POST",
+
+                    headers: {
+                        "Content-Type":
+                            "application/json"
+                    },
+
+                    body: JSON.stringify({
+
+                        direction: "jump",
+
+                        index: index
+
+                    })
+
+                }
+            );
+
+        })
+
+        .then(function() {
+
+            setTimeout(function() {
+
+                location.reload();
+
+            }, 100);
+
+        })
+
+        .catch(function(error) {
+
+            console.log(
+                "Jump navigation error:",
+                error
+            );
+
+            clearInternalNavigation();
+
+        });
+
+    }
+
+
+
+    // =====================================================
+    // SUBMIT MODAL
+    // =====================================================
+
+    const submitModal =
+        document.getElementById(
+            "submitModal"
+        );
+
+
+    const openSubmitBtn =
+        document.getElementById(
+            "openSubmitBtn"
+        );
+
+
+    const cancelSubmitBtn =
+        document.getElementById(
+            "cancelSubmitBtn"
+        );
+
+
+    const confirmSubmitBtn =
+        document.getElementById(
+            "confirmSubmitBtn"
+        );
+
+
+
+    // OPEN SUBMIT MODAL
+
+    if (openSubmitBtn) {
+
+        openSubmitBtn.addEventListener(
+            "click",
+            function() {
+
+                submitModal.classList.add(
+                    "show"
+                );
+
+            }
+        );
+
+    }
+
+
+
+    // CANCEL SUBMISSION
+
+    if (cancelSubmitBtn) {
+
+        cancelSubmitBtn.addEventListener(
+            "click",
+            function() {
+
+                submitModal.classList.remove(
+                    "show"
+                );
+
+            }
+        );
+
+    }
+
+
+
+    // CONFIRM SUBMISSION
+
+    if (confirmSubmitBtn) {
+
+        confirmSubmitBtn.addEventListener(
+            "click",
+            function() {
+
+
+                /*
+                 * Prevent monitoring events
+                 * caused by leaving the exam.
+                 */
+
+                markInternalNavigation();
+
+
+                /*
+                 * Save the current answer first.
+                 */
+
+                const form =
+                    document.getElementById(
+                        "questionForm"
+                    );
+
+
+                const formData =
+                    new FormData(form);
+
+
+                fetch(
+                    "{{ url_for('auth.save_answer') }}",
+                    {
+
+                        method: "POST",
+
+                        body: formData
+
+                    }
+                )
+
+                .then(function() {
+
+                    /*
+                     * Submit the examination
+                     */
+
+                    form.action =
+                        "{{ url_for('auth.submit_exam') }}";
+
+
+                    form.method = "POST";
+
+
+                    form.submit();
+
+                })
+
+                .catch(function(error) {
+
+                    console.log(
+                        "Submission error:",
+                        error
+                    );
+
+
+                    clearInternalNavigation();
+
+                });
+
+            }
+        );
+
+    }
+
+</script>
+
+</body>
+
+</html>

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>ExamGuard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/home.css') }}">
+
+    <link rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+
+</head>
+
+<body>
+
+    <!-- Navbar -->
+
+    <nav>
+
+        <div class="logo">
+
+            <i class="fa-solid fa-shield-halved"></i>
+
+            ExamGuard
+
+        </div>
+
+        <ul>
+
+            <li><a href="/">Home</a></li>
+            <li><a href="#features">Features</a></li>
+            <li><a href="#about">About</a></li>
+            <li><a href="/register">Register</a></li>
+            <li><a href="/login">Candidate Login</a></li>
+            <li><a href="/admin/login" style="background: #2563eb; color: white; padding: 6px 14px; border-radius: 6px; font-weight: 600;"><i class="fa-solid fa-lock"></i> Admin Login</a></li>
+        </ul>
+
+    </nav>
+
+
+    <!-- Hero Section -->
+
+    <section class="hero">
+
+        <div class="hero-text">
+
+            <h1>Online Exam Monitoring <br> & Integrity Analytics Platform</h1>
+
+            <p>
+                Secure online examinations powered by AI, OpenCV, real-time proctoring,
+                integrity scoring analytics, and automated invigilator intelligence.
+            </p>
+
+            <div style="display: flex; gap: 15px; margin-top: 25px; flex-wrap: wrap;">
+                <!-- Candidate Action Card -->
+                <div style="background: rgba(255,255,255,0.95); padding: 18px 22px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-left: 4px solid #16a34a; flex: 1; min-width: 220px;">
+                    <div style="font-size: 13px; font-weight: 700; color: #16a34a; text-transform: uppercase; margin-bottom: 5px;">
+                        <i class="fa-solid fa-user-graduate"></i> Candidate Portal
+                    </div>
+                    <p style="font-size: 13px; color: #475569; margin: 0 0 12px 0;">Take your examination securely with live proctoring.</p>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="/login" class="btn" style="padding: 8px 14px; font-size: 13px;">Login</a>
+                        <a href="/register" class="btn" style="padding: 8px 14px; font-size: 13px; background: #64748b;">Register</a>
+                    </div>
+                </div>
+
+                <!-- Admin / Invigilator Action Card -->
+                <div style="background: rgba(255,255,255,0.95); padding: 18px 22px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-left: 4px solid #2563eb; flex: 1; min-width: 220px;">
+                    <div style="font-size: 13px; font-weight: 700; color: #2563eb; text-transform: uppercase; margin-bottom: 5px;">
+                        <i class="fa-solid fa-shield-halved"></i> Invigilator / Admin
+                    </div>
+                    <p style="font-size: 13px; color: #475569; margin: 0 0 12px 0;">Monitor live sessions, view AI reports, alerts & ML analytics.</p>
+                    <a href="/admin/login" class="btn" style="padding: 8px 18px; font-size: 13px; background: #2563eb;">Admin Login</a>
+                </div>
+            </div>
+
+        </div>
+
+        <div class="hero-image">
+
+            <img src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=700"
+                alt="Online Exam">
+
+        </div>
+
+    </section>
+
+
+
+    <!-- Features -->
+
+    <section id="features">
+
+        <h2>Our Features</h2>
+
+        <div class="cards">
+
+            <div class="card">
+
+                <i class="fa-solid fa-user"></i>
+
+                <h3>Candidate Registration</h3>
+
+                <p>Create secure candidate accounts.</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-camera"></i>
+
+                <h3>Face Monitoring</h3>
+
+                <p>Detect candidate presence using OpenCV.</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-globe"></i>
+
+                <h3>Browser Tracking</h3>
+
+                <p>Monitor focus loss and tab switching.</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-robot"></i>
+
+                <h3>AI Reports</h3>
+
+                <p>Generate integrity summaries automatically.</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-chart-column"></i>
+
+                <h3>Analytics</h3>
+
+                <p>View integrity score statistics.</p>
+
+            </div>
+
+            <div class="card">
+
+                <i class="fa-solid fa-lock"></i>
+
+                <h3>Secure Sessions</h3>
+
+                <p>Safe and transparent examination process.</p>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- About -->
+
+    <section id="about">
+
+        <h2>How It Works</h2>
+
+        <div class="steps">
+
+            <div class="step">1<br>Register</div>
+
+            <div class="arrow">
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </div>
+
+            <div class="step">2<br>Login</div>
+
+            <div class="arrow">
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </div>
+
+            <div class="step">3<br>Start Exam</div>
+
+            <div class="arrow">
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </div>
+
+            <div class="step">4<br>AI Monitoring</div>
+
+            <div class="arrow">
+
+                <i class="fa-solid fa-arrow-right"></i>
+
+            </div>
+
+            <div class="step">5<br>Report</div>
+
+        </div>
+
+    </section>
+
+
+
+
+    <!-- Footer -->
+
+    <footer>
+
+        <h3>ExamGuard</h3>
+
+        <p>
+
+            Online Exam Monitoring & Integrity Analytics Platform
+
+        </p>
+
+        <p>
+
+            Developed using Python, Flask, OpenCV & SQLite
+
+        </p>
+
+    </footer>
+
+</body>
+
+</html>

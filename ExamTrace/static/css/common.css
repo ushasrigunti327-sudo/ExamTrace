@@ -1,0 +1,432 @@
+/* ==========================================
+   EXAMGUARD - COMMON CSS
+   Shared by all pages
+========================================== */
+
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap');
+
+/* ========= RESET ========= */
+
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:'Poppins',sans-serif;
+}
+
+html{
+    scroll-behavior:smooth;
+}
+
+body{
+    min-height:100vh;
+    overflow-x:hidden;
+    background:linear-gradient(135deg,#08142d,#133b7a,#1e5bc6);
+    position:relative;
+}
+
+/* ========= SCROLLBAR ========= */
+
+::-webkit-scrollbar{
+    width:8px;
+}
+
+::-webkit-scrollbar-track{
+    background:#08142d;
+}
+
+::-webkit-scrollbar-thumb{
+    background:#3b82f6;
+    border-radius:20px;
+}
+
+::-webkit-scrollbar-thumb:hover{
+    background:#2563eb;
+}
+
+/* ========= FLOATING BACKGROUND ========= */
+
+body::before{
+
+    content:"";
+
+    position:fixed;
+
+    width:380px;
+
+    height:380px;
+
+    background:rgba(255,255,255,.08);
+
+    border-radius:50%;
+
+    top:-120px;
+
+    left:-120px;
+
+    filter:blur(18px);
+
+    animation:floatOne 8s ease-in-out infinite alternate;
+
+    z-index:-1;
+
+}
+
+body::after{
+
+    content:"";
+
+    position:fixed;
+
+    width:450px;
+
+    height:450px;
+
+    background:rgba(255,255,255,.06);
+
+    border-radius:50%;
+
+    right:-150px;
+
+    bottom:-150px;
+
+    filter:blur(25px);
+
+    animation:floatTwo 10s ease-in-out infinite alternate;
+
+    z-index:-1;
+
+}
+
+@keyframes floatOne{
+
+0%{
+
+transform:translate(0,0);
+
+}
+
+100%{
+
+transform:translate(70px,90px);
+
+}
+
+}
+
+@keyframes floatTwo{
+
+0%{
+
+transform:translate(0,0);
+
+}
+
+100%{
+
+transform:translate(-70px,-90px);
+
+}
+
+}
+
+/* ========= GLASS ========= */
+
+.glass{
+
+    background:rgba(255,255,255,.12);
+
+    backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.18);
+
+    border-radius:20px;
+
+    box-shadow:0 15px 40px rgba(0,0,0,.18);
+
+}
+
+/* ========= BUTTON ========= */
+
+.btn{
+
+    display:inline-block;
+
+    padding:14px 34px;
+
+    border-radius:12px;
+
+    text-decoration:none;
+
+    border:none;
+
+    cursor:pointer;
+
+    background:#2563eb;
+
+    color:white;
+
+    font-size:16px;
+
+    font-weight:600;
+
+    transition:.35s;
+
+}
+
+.btn:hover{
+
+    transform:translateY(-4px);
+
+    background:#1d4ed8;
+
+    box-shadow:0 12px 25px rgba(37,99,235,.35);
+
+}
+
+/* ========= INPUT ========= */
+
+input,
+select,
+textarea{
+
+    width:100%;
+
+    padding:14px 18px;
+
+    border:none;
+
+    outline:none;
+
+    border-radius:12px;
+
+    background:rgba(255,255,255,.12);
+
+    color:white;
+
+    margin-top:8px;
+
+    transition:.3s;
+
+    border:1px solid transparent;
+
+}
+
+input::placeholder,
+textarea::placeholder{
+
+    color:#d1d5db;
+
+}
+
+input:focus,
+textarea:focus{
+
+    border:1px solid #60a5fa;
+
+    background:rgba(255,255,255,.16);
+
+}
+
+/* ========= TITLES ========= */
+
+.title{
+
+    font-size:46px;
+
+    color:white;
+
+    font-weight:700;
+
+}
+
+.subtitle{
+
+    color:#dbeafe;
+
+    font-size:18px;
+
+    line-height:1.8;
+
+}
+
+/* ========= CARD ========= */
+
+.card{
+
+    background:rgba(255,255,255,.12);
+
+    backdrop-filter:blur(16px);
+
+    border-radius:18px;
+
+    border:1px solid rgba(255,255,255,.15);
+
+    transition:.35s;
+
+}
+
+.card:hover{
+
+    transform:translateY(-8px);
+
+    box-shadow:0 15px 35px rgba(0,0,0,.25);
+
+}
+
+/* ========= SECTIONS ========= */
+
+section{
+
+    padding:80px 8%;
+
+}
+
+/* ========= FADE ========= */
+
+.fade{
+
+    animation:fadeUp .8s ease;
+
+}
+
+@keyframes fadeUp{
+
+0%{
+
+opacity:0;
+
+transform:translateY(40px);
+
+}
+
+100%{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+}
+
+/* ========= CONTAINER ========= */
+
+.container{
+
+    width:90%;
+
+    max-width:1400px;
+
+    margin:auto;
+
+}
+
+/* ========= TEXT ========= */
+
+h1,h2,h3,h4{
+
+    color:white;
+
+}
+
+p{
+
+    color:#e2e8f0;
+
+}
+
+/* ========= LINKS ========= */
+
+a{
+
+    text-decoration:none;
+
+}
+
+/* ========= IMAGE ========= */
+
+img{
+
+    max-width:100%;
+
+    display:block;
+
+}
+
+/* ========= RESPONSIVE ========= */
+
+@media(max-width:992px){
+
+.title{
+
+font-size:34px;
+
+}
+
+.subtitle{
+
+font-size:16px;
+
+}
+
+section{
+
+padding:60px 5%;
+
+}
+
+}
+
+@media(max-width:768px){
+
+body{
+
+overflow-x:hidden;
+
+}
+
+.title{
+
+font-size:28px;
+
+text-align:center;
+
+}
+
+.subtitle{
+
+text-align:center;
+
+}
+
+.btn{
+
+width:100%;
+
+text-align:center;
+
+}
+
+}
+.glass-card{
+
+    max-width:700px;
+
+    margin:auto;
+
+    margin-bottom:25px;
+
+    padding:30px;
+
+    border-radius:20px;
+
+    background:rgba(255,255,255,.12);
+
+    backdrop-filter:blur(18px);
+
+    border:1px solid rgba(255,255,255,.18);
+
+    text-align:center;
+
+}

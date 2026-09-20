@@ -1,0 +1,839 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invigilator Dashboard | ExamGuard</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/common.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+        body {
+            margin: 0;
+            padding: 0;
+            background: #f8fafc;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            min-height: 100vh;
+            color: #1e293b;
+        }
+
+        /* ----------------------------------------------------
+           LEFT DARK/NAVY SIDEBAR
+        ----------------------------------------------------- */
+        .sidebar {
+            width: 260px;
+            background: #0f172a;
+            color: #f1f5f9;
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            border-right: 1px solid #1e293b;
+        }
+        .sidebar-brand {
+            padding: 24px 20px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 20px;
+            font-weight: 700;
+            color: #ffffff;
+            border-bottom: 1px solid #1e293b;
+            text-decoration: none;
+        }
+        .sidebar-brand i {
+            color: #3b82f6;
+            font-size: 24px;
+        }
+        .sidebar-menu {
+            list-style: none;
+            padding: 15px 0;
+            margin: 0;
+            flex: 1;
+        }
+        .sidebar-item {
+            margin: 4px 12px;
+        }
+        .sidebar-link {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            color: #94a3b8;
+            text-decoration: none;
+            border-radius: 8px;
+            font-size: 14.5px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+        }
+        .sidebar-link i {
+            font-size: 16px;
+            width: 20px;
+            text-align: center;
+        }
+        .sidebar-link:hover {
+            color: #ffffff;
+            background: #1e293b;
+        }
+        .sidebar-link.active {
+            color: #ffffff;
+            background: #2563eb;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .sidebar-divider {
+            height: 1px;
+            background: #1e293b;
+            margin: 15px 12px;
+        }
+        .sidebar-footer {
+            padding: 18px 20px;
+            border-top: 1px solid #1e293b;
+            font-size: 13px;
+            color: #64748b;
+        }
+
+        /* ----------------------------------------------------
+           MAIN CONTENT AREA
+        ----------------------------------------------------- */
+        .main-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+        .top-navbar {
+            background: #ffffff;
+            padding: 16px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #e2e8f0;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.02);
+        }
+        .top-navbar h1 {
+            margin: 0;
+            font-size: 22px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .top-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .btn-action {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 13.5px;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: 1px solid transparent;
+        }
+        .btn-primary {
+            background: #2563eb;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #1d4ed8;
+        }
+        .btn-secondary {
+            background: #ffffff;
+            color: #334155;
+            border-color: #cbd5e1;
+        }
+        .btn-secondary:hover {
+            background: #f1f5f9;
+        }
+        .btn-streamlit {
+            background: linear-gradient(135deg, #ff4b4b 0%, #ff8585 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(255, 75, 75, 0.25);
+        }
+        .btn-streamlit:hover {
+            opacity: 0.95;
+        }
+
+        /* ----------------------------------------------------
+           DASHBOARD BODY & GRIDS
+        ----------------------------------------------------- */
+        .content-body {
+            padding: 30px;
+        }
+
+        /* KPI Summary Grid */
+        .kpi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 18px;
+            margin-bottom: 28px;
+        }
+        .kpi-card {
+            background: #ffffff;
+            padding: 20px 22px;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+        }
+        .kpi-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: #cbd5e1;
+        }
+        .kpi-card.blue::before { background: #3b82f6; }
+        .kpi-card.green::before { background: #10b981; }
+        .kpi-card.yellow::before { background: #f59e0b; }
+        .kpi-card.red::before { background: #ef4444; }
+        .kpi-card.purple::before { background: #8b5cf6; }
+
+        .kpi-title {
+            font-size: 13px;
+            font-weight: 600;
+            color: #64748b;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+        .kpi-value {
+            font-size: 28px;
+            font-weight: 700;
+            color: #0f172a;
+        }
+        .kpi-sub {
+            font-size: 12px;
+            color: #94a3b8;
+            margin-top: 6px;
+        }
+
+        /* Section Cards & Tables */
+        .section-card {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 24px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            margin-bottom: 25px;
+        }
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .section-header h2 {
+            margin: 0;
+            font-size: 18px;
+            color: #0f172a;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+        .data-table th {
+            background: #f8fafc;
+            color: #475569;
+            padding: 12px 16px;
+            font-weight: 600;
+            font-size: 12.5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #e2e8f0;
+        }
+        .data-table td {
+            padding: 13px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+        .data-table tr:hover {
+            background: #f8fafc;
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .badge-low { background: #dcfce7; color: #15803d; }
+        .badge-medium { background: #fef3c7; color: #b45309; }
+        .badge-high { background: #fee2e2; color: #b91c1c; }
+        .badge-active { background: #e0f2fe; color: #0369a1; }
+        .badge-completed { background: #f0fdf4; color: #166534; }
+
+        .btn-table {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: #f1f5f9;
+            color: #1e293b;
+            border-radius: 6px;
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            border: 1px solid #cbd5e1;
+            transition: all 0.2s;
+        }
+        .btn-table:hover {
+            background: #2563eb;
+            color: white;
+            border-color: #2563eb;
+        }
+
+        .btn-table-pdf {
+            background: #fee2e2;
+            color: #b91c1c;
+            border-color: #fca5a5;
+        }
+        .btn-table-pdf:hover {
+            background: #ef4444;
+            color: white;
+            border-color: #ef4444;
+        }
+
+        .empty-state {
+            padding: 40px 20px;
+            text-align: center;
+            color: #64748b;
+        }
+        .empty-state i {
+            font-size: 36px;
+            color: #cbd5e1;
+            margin-bottom: 12px;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- =========================================================
+         LEFT DARK SIDEBAR
+    ========================================================== -->
+    <aside class="sidebar">
+        <a href="/admin" class="sidebar-brand">
+            <i class="fa-solid fa-shield-halved"></i>
+            <span>ExamGuard</span>
+        </a>
+
+        <ul class="sidebar-menu">
+            <li class="sidebar-item">
+                <a href="/admin" class="sidebar-link {% if active_tab == 'overview' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-pie"></i>
+                    <span>Overview</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="/admin/live" class="sidebar-link {% if active_tab == 'live' %}active{% endif %}">
+                    <i class="fa-solid fa-video"></i>
+                    <span>Live Monitoring</span>
+                    {% if active_sessions_count > 0 %}
+                    <span style="background: #ef4444; color: white; border-radius: 12px; padding: 2px 7px; font-size: 11px; margin-left: auto;">{{ active_sessions_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="/admin/alerts" class="sidebar-link {% if active_tab == 'alerts' %}active{% endif %}">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    <span>Alerts</span>
+                    {% if high_risk_count > 0 %}
+                    <span style="background: #ef4444; color: white; border-radius: 12px; padding: 2px 7px; font-size: 11px; margin-left: auto;">{{ high_risk_count }}</span>
+                    {% endif %}
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="/admin/reports" class="sidebar-link {% if active_tab == 'reports' %}active{% endif %}">
+                    <i class="fa-solid fa-file-lines"></i>
+                    <span>Reports</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="/admin/analytics" class="sidebar-link {% if active_tab == 'analytics' %}active{% endif %}">
+                    <i class="fa-solid fa-chart-line"></i>
+                    <span>Analytics</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="/admin/settings" class="sidebar-link {% if active_tab == 'settings' %}active{% endif %}">
+                    <i class="fa-solid fa-gear"></i>
+                    <span>Settings</span>
+                </a>
+            </li>
+
+            <li class="sidebar-divider"></li>
+
+            <li class="sidebar-item">
+                <a href="{{ streamlit_url }}" target="_blank" class="sidebar-link" style="color: #f87171;">
+                    <i class="fa-solid fa-bolt"></i>
+                    <span>Streamlit App ↗</span>
+                </a>
+            </li>
+            <li class="sidebar-item">
+                <a href="/admin/logout" class="sidebar-link" style="color: #ef4444;">
+                    <i class="fa-solid fa-arrow-right-from-bracket"></i>
+                    <span>Logout</span>
+                </a>
+            </li>
+        </ul>
+
+        <div class="sidebar-footer">
+            <div>Logged in as:</div>
+            <strong style="color: #f1f5f9;">Invigilator Admin</strong>
+        </div>
+    </aside>
+
+
+    <!-- =========================================================
+         MAIN VIEWPORT
+    ========================================================== -->
+    <main class="main-content">
+
+        <!-- Top Navigation Header -->
+        <header class="top-navbar">
+            <div>
+                <h1>
+                    {% if active_tab == 'overview' %}
+                        <i class="fa-solid fa-chart-pie" style="color: #2563eb;"></i> Invigilator Dashboard Overview
+                    {% elif active_tab == 'live' %}
+                        <i class="fa-solid fa-video" style="color: #2563eb;"></i> Live Examination Monitoring
+                    {% elif active_tab == 'alerts' %}
+                        <i class="fa-solid fa-triangle-exclamation" style="color: #ef4444;"></i> Security & Proctoring Alerts
+                    {% elif active_tab == 'reports' %}
+                        <i class="fa-solid fa-file-lines" style="color: #2563eb;"></i> Examination Reports & Exports
+                    {% elif active_tab == 'settings' %}
+                        <i class="fa-solid fa-gear" style="color: #2563eb;"></i> Platform Proctoring Configuration
+                    {% endif %}
+                </h1>
+            </div>
+
+            <div class="top-actions">
+                <a href="{{ streamlit_url }}" target="_blank" class="btn-action btn-streamlit">
+                    <i class="fa-solid fa-bolt"></i> Launch Streamlit Dashboard
+                </a>
+                <a href="/admin/analytics" class="btn-action btn-primary">
+                    <i class="fa-solid fa-brain"></i> ML Analytics
+                </a>
+                <a href="/admin/logout" class="btn-action btn-secondary">
+                    <i class="fa-solid fa-right-from-bracket"></i> Logout
+                </a>
+            </div>
+        </header>
+
+        <div class="content-body">
+
+            <!-- Flash Messages -->
+            {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+            {% for category, message in messages %}
+            <div style="padding: 12px 18px; border-radius: 8px; margin-bottom: 20px; font-size: 14px; display: flex; align-items: center; gap: 8px;
+                {% if category == 'error' %}background: #fee2e2; color: #b91c1c; border: 1px solid #fecaca;
+                {% elif category == 'success' %}background: #dcfce7; color: #15803d; border: 1px solid #bbf7d0;
+                {% else %}background: #e0f2fe; color: #0369a1; border: 1px solid #bae6fd;{% endif %}">
+                <i class="fa-solid fa-circle-info"></i>
+                <span>{{ message }}</span>
+            </div>
+            {% endfor %}
+            {% endif %}
+            {% endwith %}
+
+            <!-- =================================================
+                 TAB 1: OVERVIEW
+            ================================================== -->
+            {% if active_tab == 'overview' %}
+
+            <!-- KPI Metric Cards -->
+            <div class="kpi-grid">
+                <div class="kpi-card blue">
+                    <div class="kpi-title">Active Sessions</div>
+                    <div class="kpi-value">{{ active_sessions_count }}</div>
+                    <div class="kpi-sub">Currently in progress</div>
+                </div>
+                <div class="kpi-card red">
+                    <div class="kpi-title">High Risk Sessions</div>
+                    <div class="kpi-value" style="color: #ef4444;">{{ high_risk_count }}</div>
+                    <div class="kpi-sub">Flagged for investigation</div>
+                </div>
+                <div class="kpi-card yellow">
+                    <div class="kpi-title">Medium Risk Sessions</div>
+                    <div class="kpi-value" style="color: #f59e0b;">{{ medium_risk_count }}</div>
+                    <div class="kpi-sub">Moderate anomalies</div>
+                </div>
+                <div class="kpi-card green">
+                    <div class="kpi-title">Low Risk Sessions</div>
+                    <div class="kpi-value" style="color: #10b981;">{{ low_risk_count }}</div>
+                    <div class="kpi-sub">Clean compliance</div>
+                </div>
+                <div class="kpi-card purple">
+                    <div class="kpi-title">Total Candidates</div>
+                    <div class="kpi-value">{{ total_candidates }}</div>
+                    <div class="kpi-sub">Registered accounts</div>
+                </div>
+                <div class="kpi-card blue">
+                    <div class="kpi-title">Mean Integrity</div>
+                    <div class="kpi-value" style="color: #2563eb;">{{ avg_integrity }}%</div>
+                    <div class="kpi-sub">Cohort average score</div>
+                </div>
+            </div>
+
+            <!-- Recent Alerts Section -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2><i class="fa-solid fa-bell" style="color: #ef4444;"></i> Recent Proctoring Incident Alerts</h2>
+                    <a href="/admin/alerts" class="btn-action btn-secondary" style="font-size: 12.5px;">View All Alerts →</a>
+                </div>
+                {% if alerts and alerts|length > 0 %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Candidate</th>
+                            <th>Event Description</th>
+                            <th>Severity</th>
+                            <th>Timestamp</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alert in alerts[:5] %}
+                        <tr>
+                            <td>
+                                <span style="font-weight: 600; color: {% if alert.category == 'Face' %}#2563eb{% else %}#7c3aed{% endif %};">
+                                    {{ alert.category }}
+                                </span>
+                            </td>
+                            <td>
+                                <strong>{{ alert.username }}</strong>
+                            </td>
+                            <td>{{ alert.event_type }}</td>
+                            <td>
+                                <span class="badge badge-{{ alert.severity.lower() }}">{{ alert.severity }}</span>
+                            </td>
+                            <td style="color: #64748b; font-size: 13px;">{{ alert.event_time }}</td>
+                            <td>
+                                <a href="/admin/session/{{ alert.session_id }}" class="btn-table">
+                                    <i class="fa-solid fa-magnifying-glass"></i> View
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <div>No suspicious proctoring alerts recorded.</div>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Monitored Sessions Table -->
+            <div class="section-card">
+                <div class="section-header">
+                    <h2><i class="fa-solid fa-list-check" style="color: #2563eb;"></i> Monitored Examination Sessions</h2>
+                    <div style="display: flex; gap: 8px;">
+                        <a href="/admin/export/csv" class="btn-action btn-secondary" style="font-size: 12.5px;"><i class="fa-solid fa-file-csv"></i> CSV</a>
+                        <a href="/admin/export/json" class="btn-action btn-secondary" style="font-size: 12.5px;"><i class="fa-solid fa-file-code"></i> JSON</a>
+                    </div>
+                </div>
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Session ID</th>
+                            <th>Candidate</th>
+                            <th>Status</th>
+                            <th>Integrity Score</th>
+                            <th>Risk Level</th>
+                            <th>Face Presence</th>
+                            <th>Exam Date</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in students[:10] %}
+                        <tr>
+                            <td><strong style="color: #64748b;">#{{ student.session_id }}</strong></td>
+                            <td>
+                                <a href="/admin/session/{{ student.session_id }}" style="color: #2563eb; font-weight: 600; text-decoration: none;">
+                                    {{ student.username }}
+                                </a>
+                                <div style="color: #94a3b8; font-size: 12px;">{{ student.email }}</div>
+                            </td>
+                            <td>
+                                <span class="badge {% if student.status == 'Completed' %}badge-completed{% elif student.status == 'Active' %}badge-active{% else %}badge-high{% endif %}">
+                                    {{ student.status }}
+                                </span>
+                            </td>
+                            <td><strong>{{ student.integrity_score if student.integrity_score is not none else 100 }}%</strong></td>
+                            <td>
+                                {% set r_level = student.risk_level or ('Low' if (student.integrity_score or 100) >= 80 else ('Medium' if (student.integrity_score or 100) >= 50 else 'High')) %}
+                                <span class="badge badge-{{ r_level.lower() }}">{{ r_level }}</span>
+                            </td>
+                            <td>{{ student.face_presence_ratio or 100.0 }}%</td>
+                            <td style="color: #64748b; font-size: 13px;">{{ student.start_time or '--:--' }}</td>
+                            <td>
+                                <a href="/admin/session/{{ student.session_id }}" class="btn-table">
+                                    <i class="fa-solid fa-magnifying-glass"></i> Review
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- =================================================
+                 TAB 2: LIVE MONITORING
+            ================================================== -->
+            {% elif active_tab == 'live' %}
+
+            <div class="section-card">
+                <div class="section-header">
+                    <h2><i class="fa-solid fa-video" style="color: #2563eb;"></i> Currently Active Examination Sessions</h2>
+                    <span style="font-size: 13px; color: #64748b;">Auto-refresh available in Streamlit Dashboard</span>
+                </div>
+
+                {% if active_students and active_students|length > 0 %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Session ID</th>
+                            <th>Candidate</th>
+                            <th>Subject</th>
+                            <th>Status</th>
+                            <th>Live Integrity</th>
+                            <th>Risk Level</th>
+                            <th>Started At</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in active_students %}
+                        <tr>
+                            <td><strong>#{{ student.session_id }}</strong></td>
+                            <td>
+                                <strong>{{ student.username }}</strong>
+                                <div style="color: #94a3b8; font-size: 12px;">{{ student.email }}</div>
+                            </td>
+                            <td>Python Programming</td>
+                            <td>
+                                <span class="badge badge-active"><i class="fa-solid fa-circle" style="font-size: 8px;"></i> Live Active</span>
+                            </td>
+                            <td><strong style="color: #2563eb;">{{ student.integrity_score or 100 }}%</strong></td>
+                            <td>
+                                <span class="badge badge-{{ (student.risk_level or 'Low').lower() }}">{{ student.risk_level or 'Low' }}</span>
+                            </td>
+                            <td style="color: #64748b; font-size: 13px;">{{ student.start_time }}</td>
+                            <td>
+                                <a href="/admin/session/{{ student.session_id }}" class="btn-table" style="background: #2563eb; color: white;">
+                                    <i class="fa-solid fa-eye"></i> View Live
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-desktop"></i>
+                    <h3>No Active Sessions</h3>
+                    <p>There are currently no candidates taking an active examination.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- =================================================
+                 TAB 3: ALERTS & EVIDENCE
+            ================================================== -->
+            {% elif active_tab == 'alerts' %}
+
+            <div class="section-card">
+                <div class="section-header">
+                    <h2><i class="fa-solid fa-shield-halved" style="color: #ef4444;"></i> Proctoring Anomaly Alerts Log</h2>
+                    <span style="font-size: 13px; color: #64748b;">Showing latest {{ alerts|length }} incident alerts</span>
+                </div>
+
+                {% if alerts and alerts|length > 0 %}
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Category</th>
+                            <th>Candidate</th>
+                            <th>Session</th>
+                            <th>Event Description</th>
+                            <th>Severity</th>
+                            <th>Timestamp</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for alert in alerts %}
+                        <tr>
+                            <td>
+                                <span style="font-weight: 600; color: {% if alert.category == 'Face' %}#2563eb{% else %}#7c3aed{% endif %};">
+                                    {{ alert.category }}
+                                </span>
+                            </td>
+                            <td><strong>{{ alert.username }}</strong></td>
+                            <td><strong style="color: #64748b;">#{{ alert.session_id }}</strong></td>
+                            <td>{{ alert.event_type }}</td>
+                            <td>
+                                <span class="badge badge-{{ alert.severity.lower() }}">{{ alert.severity }}</span>
+                            </td>
+                            <td style="color: #64748b; font-size: 13px;">{{ alert.event_time }}</td>
+                            <td>
+                                <a href="/admin/session/{{ alert.session_id }}" class="btn-table">
+                                    <i class="fa-solid fa-magnifying-glass"></i> View Evidence
+                                </a>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="empty-state">
+                    <i class="fa-solid fa-circle-check"></i>
+                    <h3>No Alerts</h3>
+                    <p>No proctoring violation alerts have been recorded.</p>
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- =================================================
+                 TAB 4: REPORTS & EXPORTS
+            ================================================== -->
+            {% elif active_tab == 'reports' %}
+
+            <div class="section-card">
+                <div class="section-header">
+                    <h2><i class="fa-solid fa-file-invoice" style="color: #2563eb;"></i> Completed Examination Reports & Data Exports</h2>
+                    <div style="display: flex; gap: 10px;">
+                        <a href="/admin/export/csv" class="btn-action btn-primary">
+                            <i class="fa-solid fa-download"></i> Export CSV
+                        </a>
+                        <a href="/admin/export/json" class="btn-action btn-secondary">
+                            <i class="fa-solid fa-download"></i> Export JSON
+                        </a>
+                    </div>
+                </div>
+
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>Session ID</th>
+                            <th>Candidate</th>
+                            <th>Status</th>
+                            <th>Integrity Score</th>
+                            <th>Risk Profile</th>
+                            <th>Face Ratio</th>
+                            <th>Completed At</th>
+                            <th>Exports & Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for student in completed_students %}
+                        <tr>
+                            <td><strong>#{{ student.session_id }}</strong></td>
+                            <td>
+                                <strong>{{ student.username }}</strong>
+                                <div style="color: #94a3b8; font-size: 12px;">{{ student.email }}</div>
+                            </td>
+                            <td><span class="badge badge-completed">Completed</span></td>
+                            <td><strong>{{ student.integrity_score }}%</strong></td>
+                            <td>
+                                <span class="badge badge-{{ (student.risk_level or 'Low').lower() }}">{{ student.risk_level or 'Low' }}</span>
+                            </td>
+                            <td>{{ student.face_presence_ratio or 100.0 }}%</td>
+                            <td style="color: #64748b; font-size: 13px;">{{ student.end_time or student.start_time }}</td>
+                            <td>
+                                <div style="display: flex; gap: 6px;">
+                                    <a href="/admin/report/{{ student.session_id }}/pdf" class="btn-table btn-table-pdf">
+                                        <i class="fa-solid fa-file-pdf"></i> PDF
+                                    </a>
+                                    <a href="/admin/session/{{ student.session_id }}" class="btn-table">
+                                        <i class="fa-solid fa-eye"></i> Details
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- =================================================
+                 TAB 5: SETTINGS
+            ================================================== -->
+            {% elif active_tab == 'settings' %}
+
+            <div class="section-card">
+                <div class="section-header">
+                    <h2><i class="fa-solid fa-sliders" style="color: #2563eb;"></i> Proctoring Rules & Platform Configuration</h2>
+                </div>
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px;">
+                    <div>
+                        <h3 style="margin-top: 0; font-size: 15px; color: #334155;">Proctoring Penalty Deductions (from base 100)</h3>
+                        <table class="data-table">
+                            <tbody>
+                                <tr><td>Tab Switch Penalty</td><td><strong>-{{ settings.penalty_tab_switch }} pts</strong></td></tr>
+                                <tr><td>Focus Loss Penalty</td><td><strong>-{{ settings.penalty_focus_loss }} pts</strong></td></tr>
+                                <tr><td>Copy Attempt Penalty</td><td><strong>-{{ settings.penalty_copy }} pts</strong></td></tr>
+                                <tr><td>Paste Attempt Penalty</td><td><strong>-{{ settings.penalty_paste }} pts</strong></td></tr>
+                                <tr><td>Restricted Shortcut Penalty</td><td><strong>-{{ settings.penalty_shortcut }} pts</strong></td></tr>
+                                <tr><td>Face Missing Penalty</td><td><strong>-{{ settings.penalty_face_missing }} pts</strong></td></tr>
+                                <tr><td>Multiple Faces Penalty</td><td><strong>-{{ settings.penalty_multiple_faces }} pts</strong></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <div>
+                        <h3 style="margin-top: 0; font-size: 15px; color: #334155;">Risk Classification Thresholds & AI Config</h3>
+                        <table class="data-table">
+                            <tbody>
+                                <tr><td>Low Risk Threshold</td><td><strong>Score &ge; {{ settings.risk_low_threshold }}%</strong></td></tr>
+                                <tr><td>Medium Risk Range</td><td><strong>Score {{ settings.risk_medium_threshold }}% – {{ settings.risk_low_threshold - 1 }}%</strong></td></tr>
+                                <tr><td>High Risk Trigger</td><td><strong>Score &lt; {{ settings.risk_medium_threshold }}%</strong></td></tr>
+                                <tr><td>Prolonged Absence Limit</td><td><strong>{{ settings.face_absence_prolonged_seconds }} seconds</strong></td></tr>
+                                <tr><td>LangChain LLM Model</td><td><strong style="color: #2563eb;">{{ settings.gemini_model }}</strong></td></tr>
+                                <tr><td>Streamlit Dashboard URL</td><td><a href="{{ settings.streamlit_url }}" target="_blank" style="color: #2563eb;">{{ settings.streamlit_url }}</a></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            {% endif %}
+
+        </div>
+    </main>
+
+</body>
+</html>

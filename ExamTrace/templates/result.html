@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Exam Result</title>
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='css/result.css') }}">
+</head>
+
+<body>
+
+<div class="result-container">
+
+    <!-- =========================================================
+         NORMALIZE MONITORING VALUES
+         Reads from monitor first.
+         Falls back to existing template variables.
+    ========================================================== -->
+
+    {% set face_missing =
+        monitor.face_missing_count
+        |default(face_missing_count|default(0, true), true)
+        |int
+    %}
+
+    {% set multiple_faces =
+        monitor.multiple_face_count
+        |default(multiple_face_count|default(0, true), true)
+        |int
+    %}
+
+    {% set tab_switches =
+        monitor.tab_switch_count
+        |default(tab_switch_count|default(0, true), true)
+        |int
+    %}
+
+    {% set focus_losses =
+        monitor.focus_loss_count
+        |default(focus_loss_count|default(0, true), true)
+        |int
+    %}
+
+    {% set right_clicks =
+        monitor.right_click_count
+        |default(right_click_count|default(0, true), true)
+        |int
+    %}
+
+    {% set copies =
+        monitor.copy_count
+        |default(copy_count|default(0, true), true)
+        |int
+    %}
+
+    {% set pastes =
+        monitor.paste_count
+        |default(paste_count|default(0, true), true)
+        |int
+    %}
+
+    {% set shortcuts =
+        monitor.shortcut_count
+        |default(shortcut_count|default(0, true), true)
+        |int
+    %}
+
+
+    {% set suspicious_count =
+        face_missing
+        + multiple_faces
+        + tab_switches
+        + focus_losses
+        + right_clicks
+        + copies
+        + pastes
+        + shortcuts
+    %}
+
+
+    <!-- =========================================================
+         HEADER
+    ========================================================== -->
+
+    <section class="result-header">
+
+        <div>
+
+            <h1>Exam Result</h1>
+
+            <p class="candidate-name">
+                Candidate:
+                <strong>{{ username }}</strong>
+            </p>
+
+            <p class="submitted-text">
+                Your examination has been successfully submitted.
+            </p>
+
+        </div>
+
+
+        <div class="submitted-badge">
+            ✓ Exam Submitted
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         SCORE SUMMARY
+    ========================================================== -->
+
+    <section class="summary-grid">
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+                Score
+            </div>
+
+            <div class="summary-value">
+                {{ score }} / {{ total }}
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+                Percentage
+            </div>
+
+            <div class="summary-value">
+                {{ percentage }}%
+            </div>
+
+        </div>
+
+
+        <div class="summary-card">
+
+            <div class="summary-title">
+                Integrity Score
+            </div>
+
+            <div class="summary-value">
+                {{ integrity_score }}%
+            </div>
+
+        </div>
+
+
+        <div class="summary-card
+            {% if integrity_score >= 80 %}
+                risk-low
+            {% elif integrity_score >= 50 %}
+                risk-medium
+            {% else %}
+                risk-high
+            {% endif %}">
+
+            <div class="summary-title">
+                Risk
+            </div>
+
+            <div class="summary-value">
+
+                {% if integrity_score >= 80 %}
+                    Low
+                {% elif integrity_score >= 50 %}
+                    Medium
+                {% else %}
+                    High
+                {% endif %}
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         MONITORING SUMMARY
+    ========================================================== -->
+
+    <section class="section-card">
+
+        <div class="section-heading">
+            <span class="section-icon">📊</span>
+            Monitoring Summary
+        </div>
+
+
+        <div class="monitor-grid">
+
+            <div class="monitor-card">
+                <span>Face Missing</span>
+                <strong>{{ face_missing }}</strong>
+            </div>
+
+
+            <div class="monitor-card">
+                <span>Multiple Faces</span>
+                <strong>{{ multiple_faces }}</strong>
+            </div>
+
+
+            <div class="monitor-card">
+                <span>Tab Switches</span>
+                <strong>{{ tab_switches }}</strong>
+            </div>
+
+
+            <div class="monitor-card">
+                <span>Focus Loss</span>
+                <strong>{{ focus_losses }}</strong>
+            </div>
+
+
+            <div class="monitor-card">
+                <span>Right Click</span>
+                <strong>{{ right_clicks }}</strong>
+            </div>
+
+
+            <div class="monitor-card">
+                <span>Copy Attempts</span>
+                <strong>{{ copies }}</strong>
+            </div>
+
+
+            <div class="monitor-card">
+                <span>Paste Attempts</span>
+                <strong>{{ pastes }}</strong>
+            </div>
+
+
+            <div class="monitor-card">
+                <span>Keyboard Shortcuts</span>
+                <strong>{{ shortcuts }}</strong>
+            </div>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         AI INTEGRITY ANALYSIS
+    ========================================================== -->
+
+    <section class="section-card">
+
+        <div class="section-heading blue-heading">
+            🤖 AI Integrity Analysis
+        </div>
+
+
+        <div class="analysis-content">
+
+            <div id="aiSummaryBox" style="background: #f0fdf4; border-left: 4px solid #22c55e; padding: 16px 20px; border-radius: 8px; margin-bottom: 20px; color: #1e293b; font-size: 14px; line-height: 1.6; white-space: pre-line;">
+                {% if ai_summary %}
+                    {{ ai_summary }}
+                {% else %}
+                    <span id="aiSummaryText" style="color: #2563eb; font-weight: 600;">
+                        ⏳ Generating AI Integrity Evaluation with LangChain & Gemini in background...
+                    </span>
+                {% endif %}
+            </div>
+
+            <h3>Behaviour Summary</h3>
+
+            <p>
+                The candidate scored
+                <strong>
+                    {{ score }} marks ({{ percentage }}%).
+                </strong>
+            </p>
+
+
+            <p>
+                The examination integrity score is
+                <strong>
+                    {{ integrity_score }}%.
+                </strong>
+            </p>
+
+
+            <!-- =================================================
+                 SUSPICIOUS ACTIVITIES
+            ================================================== -->
+
+            <h3>Suspicious Activities</h3>
+
+
+            <div class="activity-list">
+
+                {% if suspicious_count == 0 %}
+
+                    <div class="activity-success">
+
+                        <span class="activity-icon">
+                            ✓
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                No suspicious activities detected.
+                            </strong>
+
+                            <p>
+                                No monitored events were recorded
+                                during the examination.
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                {% else %}
+
+
+                    {% if face_missing > 0 %}
+
+                    <div class="activity-warning">
+
+                        <span class="activity-icon">
+                            ⚠
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Face Missing
+                            </strong>
+
+                            <p>
+                                Face was missing
+                                <strong>{{ face_missing }}</strong>
+                                time(s).
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    {% if multiple_faces > 0 %}
+
+                    <div class="activity-danger">
+
+                        <span class="activity-icon">
+                            ⚠
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Multiple Faces
+                            </strong>
+
+                            <p>
+                                Multiple faces were detected
+                                <strong>{{ multiple_faces }}</strong>
+                                time(s).
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    {% if tab_switches > 0 %}
+
+                    <div class="activity-danger">
+
+                        <span class="activity-icon">
+                            🔄
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Tab Switching
+                            </strong>
+
+                            <p>
+                                Browser tab switching occurred
+                                <strong>{{ tab_switches }}</strong>
+                                time(s).
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    {% if focus_losses > 0 %}
+
+                    <div class="activity-warning">
+
+                        <span class="activity-icon">
+                            🖥️
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Focus Loss
+                            </strong>
+
+                            <p>
+                                The examination window lost focus
+                                <strong>{{ focus_losses }}</strong>
+                                time(s).
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    {% if right_clicks > 0 %}
+
+                    <div class="activity-warning">
+
+                        <span class="activity-icon">
+                            🖱️
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Right Click
+                            </strong>
+
+                            <p>
+                                Right-click was attempted
+                                <strong>{{ right_clicks }}</strong>
+                                time(s).
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    {% if copies > 0 %}
+
+                    <div class="activity-warning">
+
+                        <span class="activity-icon">
+                            📋
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Copy Attempt
+                            </strong>
+
+                            <p>
+                                Copy operation was attempted
+                                <strong>{{ copies }}</strong>
+                                time(s).
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    {% if pastes > 0 %}
+
+                    <div class="activity-warning">
+
+                        <span class="activity-icon">
+                            📄
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Paste Attempt
+                            </strong>
+
+                            <p>
+                                Paste operation was attempted
+                                <strong>{{ pastes }}</strong>
+                                time(s).
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+
+                    {% if shortcuts > 0 %}
+
+                    <div class="activity-warning">
+
+                        <span class="activity-icon">
+                            ⌨️
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                Keyboard Shortcuts
+                            </strong>
+
+                            <p>
+                                Restricted keyboard shortcuts were
+                                attempted
+                                <strong>{{ shortcuts }}</strong>
+                                time(s).
+                            </p>
+
+                        </div>
+
+                    </div>
+
+                    {% endif %}
+
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =================================================
+                 OVERALL RISK
+            ================================================== -->
+
+            <h3>
+                Overall Risk
+            </h3>
+
+
+            <div class="
+                risk-box
+                {% if integrity_score >= 80 %}
+                    risk-box-low
+                {% elif integrity_score >= 50 %}
+                    risk-box-medium
+                {% else %}
+                    risk-box-high
+                {% endif %}
+            ">
+
+
+                {% if integrity_score >= 80 %}
+
+                    <span class="risk-icon">
+                        ✓
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Low Risk
+                        </strong>
+
+                        <p>
+                            The examination shows a relatively
+                            low level of monitoring activity.
+                        </p>
+
+                    </div>
+
+
+                {% elif integrity_score >= 50 %}
+
+                    <span class="risk-icon">
+                        ⚠
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            Medium Risk
+                        </strong>
+
+                        <p>
+                            Some monitoring events were recorded.
+                            These events should be reviewed before
+                            final evaluation.
+                        </p>
+
+                    </div>
+
+
+                {% else %}
+
+                    <span class="risk-icon">
+                        !
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            High Risk
+                        </strong>
+
+                        <p>
+                            A significant number of monitoring events
+                            were recorded during the examination.
+                        </p>
+
+                    </div>
+
+                {% endif %}
+
+            </div>
+
+
+            <!-- =================================================
+                 RECOMMENDATION
+            ================================================== -->
+
+            <h3>
+                Recommendation
+            </h3>
+
+
+            {% if suspicious_count == 0 %}
+
+                <p class="recommendation-success">
+
+                    No significant monitoring events were recorded.
+                    The examination can proceed to normal evaluation.
+
+                </p>
+
+
+            {% elif integrity_score >= 50 %}
+
+                <p class="recommendation-medium">
+
+                    Review the recorded suspicious activities before
+                    final evaluation.
+
+                </p>
+
+
+            {% else %}
+
+                <p class="recommendation-danger">
+
+                    Detailed review of the examination monitoring
+                    events is recommended before final evaluation.
+
+                </p>
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         SUSPICIOUS ACTIVITY ALERTS
+    ========================================================== -->
+
+    <section class="section-card">
+
+        <div class="section-heading blue-heading">
+            🚨 Suspicious Activity Alerts
+        </div>
+
+
+        <div class="alerts-container">
+
+
+            {% if suspicious_count == 0 %}
+
+                <div class="no-alerts">
+
+                    <span>
+                        ✓
+                    </span>
+
+                    <div>
+
+                        <strong>
+                            No suspicious activities detected.
+                        </strong>
+
+                        <p>
+                            No monitoring alerts were recorded during
+                            this examination.
+                        </p>
+
+                    </div>
+
+                </div>
+
+
+            {% else %}
+
+                <div class="alerts-intro">
+
+                    The following monitoring events were recorded
+                    during the examination:
+
+                </div>
+
+
+                {% if face_missing > 0 %}
+
+                <div class="alert-item">
+
+                    <span>👤</span>
+
+                    <div>
+
+                        <strong>
+                            Face Missing
+                        </strong>
+
+                        <p>
+                            {{ face_missing }} occurrence(s)
+                        </p>
+
+                    </div>
+
+                    <b>
+                        {{ face_missing }}
+                    </b>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if multiple_faces > 0 %}
+
+                <div class="alert-item">
+
+                    <span>👥</span>
+
+                    <div>
+
+                        <strong>
+                            Multiple Faces
+                        </strong>
+
+                        <p>
+                            Multiple faces detected
+                        </p>
+
+                    </div>
+
+                    <b>
+                        {{ multiple_faces }}
+                    </b>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if tab_switches > 0 %}
+
+                <div class="alert-item">
+
+                    <span>🔄</span>
+
+                    <div>
+
+                        <strong>
+                            Tab Switching
+                        </strong>
+
+                        <p>
+                            Browser tab changed during examination
+                        </p>
+
+                    </div>
+
+                    <b>
+                        {{ tab_switches }}
+                    </b>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if focus_losses > 0 %}
+
+                <div class="alert-item">
+
+                    <span>🖥️</span>
+
+                    <div>
+
+                        <strong>
+                            Focus Loss
+                        </strong>
+
+                        <p>
+                            Examination window lost focus
+                        </p>
+
+                    </div>
+
+                    <b>
+                        {{ focus_losses }}
+                    </b>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if right_clicks > 0 %}
+
+                <div class="alert-item">
+
+                    <span>🖱️</span>
+
+                    <div>
+
+                        <strong>
+                            Right Click
+                        </strong>
+
+                        <p>
+                            Right-click attempted
+                        </p>
+
+                    </div>
+
+                    <b>
+                        {{ right_clicks }}
+                    </b>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if copies > 0 %}
+
+                <div class="alert-item">
+
+                    <span>📋</span>
+
+                    <div>
+
+                        <strong>
+                            Copy Attempt
+                        </strong>
+
+                        <p>
+                            Copy operation attempted
+                        </p>
+
+                    </div>
+
+                    <b>
+                        {{ copies }}
+                    </b>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if pastes > 0 %}
+
+                <div class="alert-item">
+
+                    <span>📄</span>
+
+                    <div>
+
+                        <strong>
+                            Paste Attempt
+                        </strong>
+
+                        <p>
+                            Paste operation attempted
+                        </p>
+
+                    </div>
+
+                    <b>
+                        {{ pastes }}
+                    </b>
+
+                </div>
+
+                {% endif %}
+
+
+                {% if shortcuts > 0 %}
+
+                <div class="alert-item">
+
+                    <span>⌨️</span>
+
+                    <div>
+
+                        <strong>
+                            Keyboard Shortcuts
+                        </strong>
+
+                        <p>
+                            Restricted shortcut attempted
+                        </p>
+
+                    </div>
+
+                    <b>
+                        {{ shortcuts }}
+                    </b>
+
+                </div>
+
+                {% endif %}
+
+
+            {% endif %}
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         QUESTION REVIEW
+    ========================================================== -->
+
+    <section class="section-card">
+
+        <div class="section-heading">
+            📝 Question Review
+        </div>
+
+
+        <div class="table-wrapper">
+
+            <table class="question-table">
+
+                <thead>
+
+                    <tr>
+
+                        <th>No.</th>
+
+                        <th>
+                            Question
+                        </th>
+
+                        <th>
+                            Your Answer
+                        </th>
+
+                        <th>
+                            Correct Answer
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                {% for item in results %}
+
+                    <tr>
+
+                        <td>
+                            {{ loop.index }}
+                        </td>
+
+
+                        <td class="question-cell">
+                            {{ item.question }}
+                        </td>
+
+
+                        <td>
+
+                            {% if item.user_answer %}
+
+                                {{ item.user_answer }}
+
+                            {% else %}
+
+                                <span class="not-answered">
+                                    Not Answered
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <td>
+                            {{ item.correct_answer }}
+                        </td>
+
+
+                        <td>
+
+                            {% if item.is_correct %}
+
+                                <span class="correct-status">
+                                    ✓ Correct
+                                </span>
+
+                            {% else %}
+
+                                <span class="wrong-status">
+                                    ✕ Wrong
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </section>
+
+
+    <!-- =========================================================
+         ACTION BUTTONS
+    ========================================================== -->
+
+    <section class="result-actions">
+
+        <a href="{{ url_for('auth.dashboard') }}"
+           class="dashboard-button">
+
+            ← Return to Dashboard
+
+        </a>
+
+
+        <button type="button"
+                class="pdf-button"
+                onclick="window.print()">
+
+            🖨 Download / Print PDF Report
+
+        </button>
+
+    </section>
+
+
+</div>
+
+<script>
+(function() {
+    const sessionId = {{ session_id|default('null') }};
+    const initialSummary = {{ (ai_summary|tojson) if ai_summary else 'null' }};
+
+    if (sessionId && !initialSummary) {
+        let attempts = 0;
+        const maxAttempts = 30;
+
+        const pollTimer = setInterval(function() {
+            attempts++;
+            if (attempts > maxAttempts) {
+                clearInterval(pollTimer);
+                return;
+            }
+
+            fetch("/api/session_ai_summary/" + sessionId)
+                .then(function(res) {
+                    if (!res.ok) throw new Error("Status API error");
+                    return res.json();
+                })
+                .then(function(data) {
+                    if (data && data.status === "ready" && data.ai_summary) {
+                        clearInterval(pollTimer);
+                        const summaryBox = document.getElementById("aiSummaryBox");
+                        if (summaryBox) {
+                            summaryBox.textContent = data.ai_summary;
+                        }
+                    }
+                })
+                .catch(function(err) {
+                    console.log("AI summary polling:", err);
+                });
+        }, 1500);
+    }
+})();
+</script>
+
+</body>
+</html>
