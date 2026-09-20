@@ -8,7 +8,7 @@ from routes.auth import auth
 
 app = Flask(__name__)
 
-app.secret_key = "online_exam_secret"
+app.secret_key = os.environ.get("SECRET_KEY", "dev-secret-key")
 
 # Create Database Tables
 create_tables()
